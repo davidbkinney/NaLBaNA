@@ -1,6 +1,11 @@
-from . import initialization
-from . import prompts
-from . import tools
+"""
+variables.py
+
+Contains functions for extracting variables from a user description
+of a causal system.
+"""
+
+from . import initialization, prompts, tools
 import ast
 import json
 
