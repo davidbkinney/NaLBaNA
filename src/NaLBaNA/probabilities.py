@@ -1,3 +1,11 @@
+"""
+probabilities.py
+
+Contains functions that allow the generation of conditional probability tables
+defining probabilities for each variable in the LLM-generated DAG, given each
+set of possible values for its parents.
+"""
+
 from . import initialization, prompts, tools
 from itertools import product
 import ast 
