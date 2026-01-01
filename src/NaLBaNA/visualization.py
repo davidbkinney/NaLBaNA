@@ -1,3 +1,10 @@
+"""
+visualization.py
+
+Contains functions to visualize the LLM-generated DAGs representing
+the causal structure of the user-described system.
+"""
+
 import matplotlib.pyplot as plt
 import networkx as nx
 import pydot 
