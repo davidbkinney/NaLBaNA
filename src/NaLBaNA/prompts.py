@@ -3,7 +3,6 @@ prompts.py
 Contains prompts used to implement the NaLBaNA text-to-bayes-net agent. 
 """
 
-
 NODE_EXTRACTION_SYSTEM_PROMPT = """
 You are a top-tier algorithm that takes in a user description of a causal
 system and returns a list of the causal variables in the system. It is very
