@@ -32,25 +32,42 @@ def generate_bayes_net(prompt:str) -> BayesNet:
         A BayesNet dataclass instance representing the generated Bayesian network.
     """
     print("Extracting variables.")
+    #Prompt GPT 4 to create the variable list.
     var_list = variables.node_extractor(prompt)
+
+    #Check the variable list contains at least two values.
     while len(var_list) < 2:
         print("Error: Less than two variables extracted. Retrying variable extraction.")
         var_list = variables.node_extractor(prompt)
     print("Variables extracted.")
     print("Generating variable values.")
+
+    #Prompt GPT4 to generate a list of values for each variable.
     values = variables.value_generator(prompt, var_list)
+
+    #Check that the all and only the previously generated variables are assigned values.
     while [v["variable"] for v in values] != var_list:
         print("Error: Mismatch between extracted variables and generated variable values. Retrying value generation.")
         values = variables.value_generator(prompt, var_list)
+
+    #Check that all variables have at least two values.
     while variables.check_values(values):
         print("Error: One or more variables have invalid values. Retrying value generation.")
         values = variables.value_generator(prompt, var_list)
     print("Variable values generated.")
+
+    #Prompt GPT4 to define a DAG over the causal variables.
     print("Defining causal graph.")
     graph_list = graphing.graph_generator(prompt, [v['variable'] for v in values])
+
+    #Check that all and only the previously generated variables are included in the DAG.
     while graphing.nodes_checker([v['variable'] for v in values], graph_list):
         print("Error: Graph contains nodes not in variable list. Retrying graph generation.")
         graph_list = graphing.graph_generator(prompt, [v['variable'] for v in values])
+
+    #For each variable in the DAG, prompt GPT4 to assign a probability score to each possible
+    #value of that variable, given each combination of values taken by its parents. Then convert
+    #those scores into probabilities via softmax.
     cond_probs = []
     count = 1
     for var in var_list:
@@ -62,6 +79,8 @@ def generate_bayes_net(prompt:str) -> BayesNet:
         print(f"{count} of {len(var_list)} conditional probability tables generated (one per variable).")
         count += 1
     print("Conditional probability tables generated.")
+
+    #Create the Bayesian Network object.
     bayes_net = BayesNet(var_list,values,graph_list,cond_probs)
     print("Bayesian network generated!")
     return (bayes_net)
