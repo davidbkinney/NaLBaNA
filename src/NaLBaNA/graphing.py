@@ -1,3 +1,10 @@
+"""
+graphing.py
+
+Contains functions the create DAGs relating the variables extracted 
+from the user prompt, based on the user description of a causal 
+system.
+"""
 from. import initialization, prompts, tools
 import json
 import ast
