@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "NaLBaNA"
+version = "0.1.01"
+description = "NaLBaNA: Natural Language to Bayesian Network Agent"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+  { name = "David Kinney", email = "kinney@wustl.edu" }
+]
+
+dependencies = [
+  "openai",
+  "matplotlib",
+  "networkx",
+  "pydot",
+  "pandas",
+  "numpy"
+]
+
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/yourname/NaLBaNA"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["NaLBaNA*"]
