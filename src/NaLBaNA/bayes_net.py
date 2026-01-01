@@ -1,3 +1,8 @@
+"""
+bayes_net.py
+
+Contains the core code to generate Bayesian networks from prompts.
+"""
 from . import probabilities, variables, graphing, visualization, initialization
 
 from dataclasses import dataclass
