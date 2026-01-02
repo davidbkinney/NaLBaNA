@@ -164,13 +164,14 @@ def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, co
     for var in condition_variables:
         if var not in bayes_net.vars:
             return f"Inputted condition variable {var} is not a node in the Bayesian Network!"
-    for var in [i["variable"] for i in intervention]:
-        if var not in bayes_net.vars:
-            return f"Inputted intervention variable {var} is not a node in the Bayesian Network!"
-        intervention_value = [i for i in intervention if i["variable"] == var][0]["value"]
-        variable_values = [val for val in bn.values if i["variable"] == var][0]["values"]
-        if intervention_value not in variable_values:
-            return f"{intervention_value} is not a value of {var} in the Bayesian Network!"
+    if intevention is not None:
+        for var in [i["variable"] for i in intervention]:
+            if var not in bayes_net.vars:
+                return f"Inputted intervention variable {var} is not a node in the Bayesian Network!"
+            intervention_value = [i for i in intervention if i["variable"] == var][0]["value"]
+            variable_values = [val for val in bn.values if i["variable"] == var][0]["values"]
+            if intervention_value not in variable_values:
+                return f"{intervention_value} is not a value of {var} in the Bayesian Network!"
     joint_df = get_joint_distribution(bayes_net, intervention)
     column_names = [' ']
     condition_values = [v for v in bayes_net.values if v['variable'] in condition_variables]
