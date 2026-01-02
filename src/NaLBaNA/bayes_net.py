@@ -64,10 +64,12 @@ def generate_bayes_net(prompt:str) -> BayesNet:
     while graphing.nodes_checker([v['variable'] for v in values], graph_list):
         print("Error: Graph contains nodes not in variable list. Retrying graph generation.")
         graph_list = graphing.graph_generator(prompt, [v['variable'] for v in values])
-
+    print("Causal graph defined.")
+    
     #For each variable in the DAG, prompt GPT4 to assign a probability score to each possible
     #value of that variable, given each combination of values taken by its parents. Then convert
     #those scores into probabilities via softmax.
+    print("Generating conditional probability tables.")
     cond_probs = []
     count = 1
     for var in var_list:
