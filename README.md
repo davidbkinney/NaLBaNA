@@ -29,3 +29,7 @@ After generating a Bayesian network from a natural language input, users can obt
 marginal probabilities over variables in the network, simulate interventions on combinations of variables in the network,
 and change the conditional probability distribution over a variable in the network, given some combination of 
 its parents.
+
+NaLBaNA requires the user to input and use [an OpenAI API key](https://openai.com/api/). API costs are only 
+incurred when a Bayesian Network is generated from a prompt. Generating a Bayesian network tends to cost between $0.01 and 
+$0.05. Ensure appropriate spending warnings and limits are in place before deploying NaLBaNA at scale.
