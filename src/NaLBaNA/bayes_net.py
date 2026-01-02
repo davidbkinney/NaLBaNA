@@ -266,14 +266,26 @@ def change_conditional_probabilities(bayes_net:BayesNet, variable:str,
     Returns:
         The modified Bayes net.
     """
+    #Check that the input variable is in the Bayesian Network.
+    if variable not in bayes_net.vars:
+        return f"Inputted variable {event_variable} is not a node in the Bayesian Network!"
+                                         
+    #Check that the user-inputted parent variables really are parents of the variable whose
+    #conditional probability distribution is to be changed.
     parents = graphing.get_parents(variable, bayes_net.graph)
     input_variables = [par["variable"] for par in parent_values]
     if set(parents) != set(input_variables):
-        raise ValueError("Input parent variables do not match actual parents of the variable.")
+        return "Input parent variables do not match actual parents of the variable."
+
+    #Check that values of the parent variables being conditioned on really are values of the
+    #parent variables.
     for val in parent_values:
         values = [v for v in bayes_net.values if v['variable'] == val['variable']][0]['values']
         if val['value'] not in values:
-            raise ValueError(f"{val['value']} is not a value of the variable {val['variable']}.")
+            return f"{val['value']} is not a value of the variable {val['variable']}."
+
+    #Change the conditional probability distribution over the specified variavle to the 
+    #user-inputted distribution.
     conditional_probabilities = bayes_net.conditional_probabilities
     for cp in conditional_probabilities:
         if cp['variable'] == variable:
