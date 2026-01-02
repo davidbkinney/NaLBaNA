@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "NaLBaNA"
-version = "0.1.01"
+version = "0.1.0"
 description = "NaLBaNA: Natural Language to Bayesian Network Agent"
 readme = "README.md"
 license = { text = "MIT" }
