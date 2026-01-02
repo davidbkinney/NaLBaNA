@@ -134,7 +134,8 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
                 matching = [i for i in intervention if i['variable'] == var]
                 if matching:
                     probs.append(1.0 if matching[0]['value'] == row[var] else 0.0)
-                    continue
+                else:
+                    probs.append(parent_value_match['conditional_probability'])
             
         #Obtain the joint probability by finding the product of all the conditional
         #probabilities for children, given their parents.
