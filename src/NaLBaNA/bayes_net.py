@@ -164,7 +164,7 @@ def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, co
     for var in condition_variables:
         if var not in bayes_net.vars:
             return f"Inputted condition variable {var} is not a node in the Bayesian Network!"
-    if intevention is not None:
+    if intervention is not None:
         for var in [i["variable"] for i in intervention]:
             if var not in bayes_net.vars:
                 return f"Inputted intervention variable {var} is not a node in the Bayesian Network!"
