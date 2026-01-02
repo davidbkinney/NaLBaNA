@@ -130,15 +130,11 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
             ][0]
             #If an intervention has been specified, enforce the logic of the do-calculus
             #when calculating joint the joint distribution.
-            if intervention:
-                for i in intervention:
-                    if i['variable'] == var:
-                        if i['value'] == row[var]:
-                            probs.append(1.0)
-                        else:
-                            probs.append(0.0)
-            else:
-                probs.append(parent_value_match['conditional_probability'])
+            if intervention is not None:
+                matching = [i for i in intervention if i['variable'] == var]
+                if matching:
+                    probs.append(1.0 if matching[0]['value'] == row[var] else 0.0)
+                    continue
             
         #Obtain the joint probability by finding the product of all the conditional
         #probabilities for children, given their parents.
