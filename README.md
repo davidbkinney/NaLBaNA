@@ -16,7 +16,7 @@ receive as output a Python object containing:
 
 1. A set of random variables representing the causal relata of the described system.
 2. A set of mutually exclusive and jointly exhausting values for each variable.
-3. A directed acyclic graph (or "DAG") representing the causal relationships between 
+3. A directed acyclic graph (or "DAG") representing the causal relationships between variables.
 4. A joint probability distribution over each variable in the DAG.
 
 All four of these steps are accomplished by strategically prompting a large language model 
