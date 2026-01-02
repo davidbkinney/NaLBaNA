@@ -33,3 +33,6 @@ its parents.
 NaLBaNA requires the user to input and use [an OpenAI API key](https://openai.com/api/). API costs are only 
 incurred when a Bayesian Network is generated from a prompt. Generating a Bayesian network tends to cost between $0.01 and 
 $0.05. Ensure appropriate spending warnings and limits are in place before deploying NaLBaNA at scale.
+
+View the [tutorials](https://github.com/davidbkinney/NaLBaNA/tree/main/tutorials) for some Jupyter notebooks with examples of
+simple use cases.
