@@ -159,11 +159,18 @@ def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, co
     Returns:
         A pandas DataFrame representing the conditional probability table.
     """
+
+    #Check that the event variable is in the Bayesian Network.
     if event_variable not in bayes_net.vars:
         return f"Inputted event variable {event_variable} is not a node in the Bayesian Network!"
+
+    #Check that the condition variables are in the Bayesian Network.
     for var in condition_variables:
         if var not in bayes_net.vars:
             return f"Inputted condition variable {var} is not a node in the Bayesian Network!"
+
+    #Check that the intervention variables are in the Bayesian network, and that the values that
+    #they are set to are valid.
     if intervention is not None:
         for var in [i["variable"] for i in intervention]:
             if var not in bayes_net.vars:
@@ -172,7 +179,14 @@ def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, co
             variable_values = [val for val in bayes_net.values if val["variable"] == var][0]["values"]
             if intervention_value not in variable_values:
                 return f"{intervention_value} is not a value of {var} in the Bayesian Network!"
+
+    #Get the joint distribution over the Bayesian Network, applying any specified interventions.
     joint_df = get_joint_distribution(bayes_net, intervention)
+
+    #Create a Pandas dataframe in which the first column has a blank heading and contains the
+    #values of the event variable, and each other column heading specifies a combination of 
+    #possible values for the intervention variable, with entries showing the probability of the
+    #row event, given the column events.
     column_names = [' ']
     condition_values = [v for v in bayes_net.values if v['variable'] in condition_variables]
     condition_combos = probabilities.get_joint_combos(condition_values)
