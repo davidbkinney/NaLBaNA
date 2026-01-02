@@ -286,6 +286,14 @@ def change_conditional_probabilities(bayes_net:BayesNet, variable:str,
         if val['value'] not in values:
             return f"{val['value']} is not a value of the variable {val['variable']}."
 
+    #Check that the user-inputted probabilities sum to one and are positive.
+    if np.sum([p['new_probability'] for p in new_probabilities])!=1.0:
+        return "User-inputted probabilities must sum to one!"
+
+    for p in new_probabilities:
+        if p['new_probability']<0:
+            return "User-inputted probabilities must be non-negative!"
+
     #Change the conditional probability distribution over the specified variavle to the 
     #user-inputted distribution.
     conditional_probabilities = bayes_net.conditional_probabilities
