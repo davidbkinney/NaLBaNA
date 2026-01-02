@@ -103,8 +103,16 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
         A pandas DataFrame representing the joint distribution, applying
         any specified interventions.
     """
+    #Obtain the Cartesian product of the value space of each variable.
     joint_combos = probabilities.get_joint_combos(bayes_net.values)
+    
+    #Create one row of the dataframe for each element of the Cartesian product.
     rows = [{c['variable']: c['value'] for c in combo} for combo in joint_combos]
+
+    #Loop through each element of the Cartesian product, and calculate its joint probability
+    #by looping through each variable and obtaining the conditional probability of it taking
+    #the value in the product, given that its parents in the obtained DAG take their value in the
+    #product.
     for row in rows:
         probs = []
         for var in bayes_net.vars:
@@ -120,6 +128,8 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
                     == sorted(parent_values, key=lambda x: x['variable'])
                 )
             ][0]
+            #If an intervention has been specified, enforce the logic of the do-calculus
+            #when calculating joint the joint distribution.
             if intervention:
                 for i in intervention:
                     if i['variable'] == var:
@@ -128,6 +138,9 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
                         else:
                             parent_value_match['conditional_probability'] = 0.0
             probs.append(parent_value_match['conditional_probability'])
+            
+        #Obtain the joint probability by finding the product of all the conditional
+        #probabilities for children, given their parents.
         row['joint_probability'] = np.prod(probs)
     joint_df = pd.DataFrame(rows)
     return joint_df
