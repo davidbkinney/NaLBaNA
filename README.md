@@ -21,8 +21,9 @@ receive as output a Python object containing:
 
 All four of these steps are accomplished by strategically prompting a large language model 
 (or "LLM"), specifically GPT-4.1. As such, _all four of the elements of the Bayeian network 
-described above represent an LLM's best guess at the underlying causal dynamics of the described
-system, rather than any specific ``ground truth'' or data-based reality._
+described above represent an LLM's "best guess" at the underlying causal dynamics of the described
+system (i.e., the most likely response given the user input and the LLM's training data), 
+rather than any specific "ground truth" or data-based reality._
 
 After generating a Bayesian network from a natural language input, users can obtain joint, conditional, and
 marginal probabilities over variables in the network, simulate interventions on combinations of variables in the network,
