@@ -105,6 +105,25 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
         A pandas DataFrame representing the joint distribution, applying
         any specified interventions.
     """
+
+    # Cache CPTs by variable to avoid repeated scans
+    cpt_by_var = {
+        cp['variable']: cp
+        for cp in bayes_net.conditional_probabilities
+    }
+
+    # Cache parents by variable to avoid repeated graph traversal
+    parents_by_var = {
+        var: graphing.get_parents(var, bayes_net.graph)
+        for var in bayes_net.vars
+    }
+
+    # Cache interventions for O(1) lookup
+    intervention_by_var = (
+        {i['variable']: i for i in intervention}
+        if intervention is not None else {}
+    )
+
     #Obtain the Cartesian product of the value space of each variable.
     joint_combos = probabilities.get_joint_combos(bayes_net.values)
     
@@ -118,9 +137,12 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
     for row in rows:
         probs = []
         for var in bayes_net.vars:
-            cpt = [cp for cp in bayes_net.conditional_probabilities if cp['variable'] == var][0]
-            variable_value_matches = [e for e in cpt['conditional_scores_and_probs'] if e['event'][0]['value'] == row[var]]
-            parents = graphing.get_parents(var, bayes_net.graph)
+            cpt = cpt_by_var[var]
+            variable_value_matches = [
+                e for e in cpt['conditional_scores_and_probs']
+                if e['event'][0]['value'] == row[var]
+            ]
+            parents = parents_by_var[var]
             parent_values = [{'variable': p, 'value': row[p]} for p in parents]
             parent_value_match = [
                 e for e in variable_value_matches
@@ -133,9 +155,9 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
             #If an intervention has been specified, enforce the logic of the do-calculus
             #when calculating joint the joint distribution.
             if intervention is not None:
-                matching = [i for i in intervention if i['variable'] == var]
+                matching = intervention_by_var.get(var)
                 if matching:
-                    probs.append(1.0 if matching[0]['value'] == row[var] else 0.0)
+                    probs.append(1.0 if matching['value'] == row[var] else 0.0)
                 else:
                     probs.append(parent_value_match['conditional_probability'])
             else:
@@ -146,6 +168,7 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
         row['joint_probability'] = np.prod(probs)
     joint_df = pd.DataFrame(rows)
     return joint_df
+
 
 def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, condition_variables:list,
                                       intervention=None) -> pd.DataFrame:
