@@ -73,7 +73,7 @@ def cycle_breaker(cycle:list) -> list:
   """
   nodes = nodes_from_graph(cycle)
   client = initialization.get_client()
-  response = client.openai_client.chat.completions.create(
+  response = client.chat.completions.create(
       model="gpt-4.1",
       messages=[{"role": "system",
       "content": prompts.CYCLE_BREAKER_SYSTEM_PROMPT},
