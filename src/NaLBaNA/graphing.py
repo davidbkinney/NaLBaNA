@@ -5,7 +5,7 @@ Contains functions the create DAGs relating the variables extracted
 from the user prompt, based on the user description of a causal 
 system.
 """
-import initialization, prompts, tools
+from . import initialization, prompts, tools
 import json
 import ast
 from collections import defaultdict
