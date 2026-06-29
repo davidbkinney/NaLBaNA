@@ -6,7 +6,7 @@ defining probabilities for each variable in the LLM-generated DAG, given each
 set of possible values for its parents.
 """
 
-import initialization, prompts, tools
+from . import initialization, prompts, tools
 from itertools import product
 import ast 
 import numpy as np
