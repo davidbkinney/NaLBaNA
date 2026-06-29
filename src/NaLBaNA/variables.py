@@ -5,7 +5,7 @@ Contains functions for extracting variables from a user description
 of a causal system.
 """
 
-from . import initialization, prompts, tools
+import initialization, prompts, tools
 import ast
 import json
 
@@ -20,7 +20,7 @@ def node_extractor(prompt:str) -> list:
     """
     client = initialization.get_client()
     response = client.chat.completions.create(
-        model="gpt-4.1",
+        model="gpt-5.4",
         messages=[{"role": "system",
         "content": prompts.NODE_EXTRACTION_SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
@@ -46,7 +46,7 @@ def value_generator(prompt:str,nodes:list) -> list:
     """
     client = initialization.get_client()
     response = client.chat.completions.create(
-        model="gpt-4.1",
+        model="gpt-5.4",
         messages=[{"role": "system",
         "content": prompts.VALUE_GENERATOR_SYSTEM_PROMPT.format(description=prompt)},
             {"role": "user",

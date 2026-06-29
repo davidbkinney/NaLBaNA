@@ -6,21 +6,20 @@ defining probabilities for each variable in the LLM-generated DAG, given each
 set of possible values for its parents.
 """
 
-from . import initialization, prompts, tools
+import initialization, prompts, tools
 from itertools import product
 import ast 
 import numpy as np
 
 
-def softmax(score:int, scores:list, beta:float) -> float:
-    """Convert a score to a probability using softmax."""
-    exp_scores = np.exp(np.array(scores) * beta)
-    probabilities = exp_scores / np.sum(exp_scores)
+def normalization(score:int, scores:list) -> float:
+    """Normalize probabilities if they do not sum to one."""
+    probabilities = scores / np.sum(scores)
     index = scores.index(score)
-    return float(probabilities[index])
+    return np.round(float(probabilities[index]),3)
 
 
-def get_joint_combos(values, fixed_probs=None):
+def get_joint_combos(values):
     """
     Get all combinations of value assignments for variables.
     """
@@ -65,7 +64,7 @@ def get_parent_child_combos(child:str, parents:list, values:list) -> list:
 
 def probability_scores(variable: str, prompt:str, combos:list, max_retries=3) -> list:
     """
-    Assigns a conditional probability score between 1 and 10 to each even that a variables takes
+    Assigns a conditional probability between .01 and .99 to each even that a variables takes
     any of its values, given that some other variables take specific values.
 
     Args:
@@ -85,7 +84,7 @@ def probability_scores(variable: str, prompt:str, combos:list, max_retries=3) ->
     while attempts < max_retries:
         try:
             response = client.chat.completions.create(
-                model="gpt-4.1",
+                model="gpt-5.4",
                 messages=[
                     {"role": "system", "content": prompts.CONDITIONAL_PROBABILITY_SCORING_SYSTEM_PROMPT.format(description=prompt)},
                     {"role": "user", "content": str(combos)}
@@ -127,14 +126,13 @@ def probability_scores(variable: str, prompt:str, combos:list, max_retries=3) ->
     raise Exception(f"Failed to get a valid response after {max_retries} attempts. JSON String: {json_str}")
 
 
-def assign_conditional_probabilities(scores:dict,beta:float) -> dict:
+def assign_conditional_probabilities(scores:dict) -> dict:
     """
-    Converts conditional probability scores to conditional probabilities using softmax.
+    Converts conditional probability scores to conditional probabilities using normalization.
     Args:
         scores: A dictionary containing the variable name and a list consisting of all variable-value combinations
                 being assigned a conditional probability score, the variable-value combinations being conditioned upon,
                 and the assigned score.
-        beta: The beta parameter for the softmax function.
     
     Returns:
         The input dictionary with an added 'conditional_probability' key for each score entry.
@@ -143,13 +141,13 @@ def assign_conditional_probabilities(scores:dict,beta:float) -> dict:
     unique_conditions = list(set(tuple((c['variable'], c['value']) for c in s['conditions'])
         for s in scores['conditional_scores_and_probs']))
     
-    #For each unique condition, compute softmax probabilities for the associated probability 
+    #For each unique condition, compute normalized probabilities for the associated probability 
     #scores assigned to each event, given that condition, and add them to the output dictionary. 
     for c in unique_conditions:
         conditional_scores = [s['score'] for s in scores['conditional_scores_and_probs'] if 
                               tuple((c['variable'], c['value']) for c in s['conditions']) == c]
         for s in scores['conditional_scores_and_probs']:
             if tuple((c['variable'], c['value']) for c in s['conditions']) == c:
-                s['conditional_probability'] = softmax(s['score'], conditional_scores, beta)
+                s['conditional_probability'] = normalization(s['score'], conditional_scores)
     # Return the updated dictionary with conditional probabilities.
     return scores 

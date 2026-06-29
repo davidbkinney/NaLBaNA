@@ -3,7 +3,7 @@ bayes_net.py
 
 Contains the core code to generate Bayesian networks from prompts.
 """
-from . import probabilities, variables, graphing, visualization, initialization
+import probabilities, variables, graphing, visualization, initialization
 
 from dataclasses import dataclass
 import numpy as np
@@ -76,7 +76,7 @@ def generate_bayes_net(prompt:str) -> BayesNet:
         parents = graphing.get_parents(var, graph_list)
         combos = probabilities.get_parent_child_combos(var, parents, values)
         scores = probabilities.probability_scores(var, prompt, combos)
-        conditional_probs = probabilities.assign_conditional_probabilities(scores, beta=.2)
+        conditional_probs = probabilities.assign_conditional_probabilities(scores)
         cond_probs.append(conditional_probs)
         print(f"{count} of {len(var_list)} conditional probability tables generated (one per variable).")
         count += 1
@@ -273,6 +273,7 @@ def get_marginal_distribution(bayes_net:BayesNet, variable:str, intervention=Non
         marginal_rows.append({variable: val, 'marginal_probability': prob})
     marginal_df = pd.DataFrame(marginal_rows)
     return marginal_df
+
 
 def change_conditional_probabilities(bayes_net:BayesNet, variable:str, 
                                      parent_values:list, new_probabilities:dict) -> BayesNet:

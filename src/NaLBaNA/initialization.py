@@ -3,7 +3,7 @@ initialization.py
 
 Initializes the OpenAI client.
 """
-import openai
+
 from openai import OpenAI
 
 openai_client = None  # initially empty

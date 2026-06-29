@@ -172,7 +172,7 @@ def make_conditional_probability_scoring_tool(parent_child_combos:list):
         "function": {
             "name": "assign_conditional_likelihood_scores",
             "description": (
-                "Assigns a likelihood score from 1 (least likely) to 10 (most likely) "
+                "Assigns a probability score from .01 (least likely) to .99 (most likely) "
                 "to the event that a variable takes some value, given that other "
                 "variables take specific values."
             ),
@@ -198,8 +198,8 @@ def make_conditional_probability_scoring_tool(parent_child_combos:list):
                                 },
                                 "score": {
                                     "type": "number",
-                                    "minimum": 1,
-                                    "maximum": 10
+                                    "minimum": .01,
+                                    "maximum": .99
                                 }
                             },
                             "required": ["event", "conditions", "score"]

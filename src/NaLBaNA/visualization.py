@@ -7,7 +7,6 @@ the causal structure of the user-described system.
 
 import matplotlib.pyplot as plt
 import networkx as nx
-import pydot 
 from typing import List, Dict
 import textwrap
 

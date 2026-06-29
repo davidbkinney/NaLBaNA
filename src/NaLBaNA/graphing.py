@@ -5,10 +5,9 @@ Contains functions the create DAGs relating the variables extracted
 from the user prompt, based on the user description of a causal 
 system.
 """
-from. import initialization, prompts, tools
+import initialization, prompts, tools
 import json
 import ast
-import collections 
 from collections import defaultdict
 
 
@@ -74,7 +73,7 @@ def cycle_breaker(cycle:list) -> list:
   nodes = nodes_from_graph(cycle)
   client = initialization.get_client()
   response = client.chat.completions.create(
-      model="gpt-4.1",
+      model="gpt-5.4",
       messages=[{"role": "system",
       "content": prompts.CYCLE_BREAKER_SYSTEM_PROMPT},
           {"role": "user", "content": str(cycle)}
@@ -99,7 +98,7 @@ def graph_generator(prompt:str,nodes:list) -> dict:
     """
     client = initialization.get_client()
     response = client.chat.completions.create(
-        model="gpt-4.1",
+        model="gpt-5.4",
         messages=[{"role": "system",
         "content": prompts.GRAPH_GENERATOR_SYSTEM_PROMPT.format(description=prompt)},
             {"role": "user",

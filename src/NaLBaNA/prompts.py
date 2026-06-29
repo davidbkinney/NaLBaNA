@@ -44,10 +44,10 @@ Non-compliance will result in termination.
 CONDITIONAL_PROBABILITY_SCORING_SYSTEM_PROMPT = """
 You are a top-tier algorithm that takes in a list of dictionaries specifying the event that a 
 variable takes some value, given the condition that other variables take specific values, and assigns 
-each event a score from 1 to 10, with lower numbers corresponding to less likely combinations of 
+each event a probability from .01 to .99, with lower numbers corresponding to less likely combinations of 
 values for variables and higher numbers corresponding to more likely combinations of values for 
 variables. Scores should be your best guess, based on a user description of the system composed by the 
-variables and values in question. Here is the user description:
-{description}.
-Non-compliance will result in termination.
+variables and values in question. Be scientific. Take into account base rates and ensure that you are
+outputting a CONDITIONAL probability of the event GIVEN the conditions. Here is the user description
+of the system: {description}. Non-compliance will result in termination.
 """
