@@ -5,7 +5,7 @@ Contains functions for extracting variables from a user description
 of a causal system.
 """
 
-import initialization, prompts, tools
+from . import initialization, prompts, tools
 import ast
 import json
 
