@@ -19,7 +19,7 @@ NODE_LIST_TOOL = {
                             "on user's input")
                         }
                     },
-                    "required": ["items"]
+                    "required": ["nodes"]
                 }
             }
         }
