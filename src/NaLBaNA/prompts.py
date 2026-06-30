@@ -34,12 +34,6 @@ Here is the user description:
 {description}.
 """
 
-CYCLE_BREAKER_SYSTEM_PROMPT = """
-You are a top-tier algorithm that takes in a list of dictionaries specifying the cause-effect
-relationships in a system. Those cause-effect relationships contain cycles.  You MUST output 
-a list of dictionaries that minimally changes the causal structure while breaking any cycles.
-Non-compliance will result in termination. 
-"""
 
 CONDITIONAL_PROBABILITY_SCORING_SYSTEM_PROMPT = """
 You are a top-tier algorithm that takes in a list of dictionaries specifying the event that a 
