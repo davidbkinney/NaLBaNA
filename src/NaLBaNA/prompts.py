@@ -35,9 +35,9 @@ Here is the user description:
 """
 
 CYCLE_BREAKER_SYSTEM_PROMPT = """
-You are a top-tier algorithm that takes in a list of JSON dictionaries
-containing a cyclic causal relationship and outputs a new list with no cycles.
-You MUST output a list of dictionaries that breaks any cycles.
+You are a top-tier algorithm that takes in a list of dictionaries specifying the cause-effect
+relationships in a system. Those cause-effect relationships contain cycles.  You MUST output 
+a list of dictionaries that minimally changes the causal structure while breaking any cycles.
 Non-compliance will result in termination. 
 """
 
