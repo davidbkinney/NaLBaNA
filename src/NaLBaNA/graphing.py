@@ -112,11 +112,20 @@ def graph_generator(prompt:str,nodes:list) -> dict:
     # The model may call the tool once; get the arguments JSON
     arguments_json = tool_calls[0].function.arguments
     structured_output = json.loads(arguments_json)
-    while len(find_cycles(structured_output['edges']))>0:
-        print ("Cycles detected in the generated graph. Enforcing acyclicality.")
-        structured_output['edges'] = cycle_breaker(structured_output['edges'])
-    return structured_output['edges']
+    previous = None
+    while True:
+        cycles = find_cycles(structured_output["edges"])
+        if not cycles:
+            break
     
+        print("Cycles detected in the generated graph. Enforcing acyclicality.")
+    
+        if structured_output["edges"] == previous:
+            raise RuntimeError("cycle_breaker returned the same graph twice.")
+    
+        previous = structured_output["edges"]
+        structured_output["edges"] = cycle_breaker(structured_output["edges"])
+        
     
 def get_parents(node:str,graph:list) -> list:
     """
