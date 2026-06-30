@@ -126,6 +126,8 @@ def graph_generator(prompt:str,nodes:list) -> dict:
         previous = structured_output["edges"]
         structured_output["edges"] = cycle_breaker(structured_output["edges"])
         
+    return structured_output["edges"]
+        
     
 def get_parents(node:str,graph:list) -> list:
     """
