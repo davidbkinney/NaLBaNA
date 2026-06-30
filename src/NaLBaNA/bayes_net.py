@@ -170,10 +170,15 @@ def get_joint_distribution(bayes_net:BayesNet,intervention=None) -> pd.DataFrame
     return joint_df
 
 
-def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, condition_variables:list,
-                                      intervention=None) -> pd.DataFrame:
+def get_conditional_probability_table(
+    bayes_net: BayesNet,
+    event_variable: str,
+    condition_variables: list,
+    intervention=None
+) -> pd.DataFrame:
     """
-    Obtains the conditional probability table P(event_variable | condition_variables) from the Bayes net.
+    Obtains the conditional probability table P(event_variable | condition_variables)
+    from the Bayes net.
 
     Args:
         bayes_net: The Bayes net to analyze.
@@ -185,50 +190,81 @@ def get_conditional_probability_table(bayes_net:BayesNet, event_variable:str, co
         A pandas DataFrame representing the conditional probability table.
     """
 
-    #Check that the event variable is in the Bayesian Network.
+    # Build a lookup table once instead of repeatedly searching bayes_net.values
+    value_lookup = {
+        entry["variable"]: entry["values"]
+        for entry in bayes_net.values
+    }
+
+    # Check event variable
     if event_variable not in bayes_net.vars:
         return f"Inputted event variable {event_variable} is not a node in the Bayesian Network!"
 
-    #Check that the condition variables are in the Bayesian Network.
+    # Check conditioning variables
     for var in condition_variables:
         if var not in bayes_net.vars:
             return f"Inputted condition variable {var} is not a node in the Bayesian Network!"
 
-    #Check that the intervention variables are in the Bayesian network, and that the values that
-    #they are set to are valid.
+    # Check interventions
     if intervention is not None:
-        for var in [i["variable"] for i in intervention]:
+        for item in intervention:
+            var = item["variable"]
+            value = item["value"]
+
             if var not in bayes_net.vars:
                 return f"Inputted intervention variable {var} is not a node in the Bayesian Network!"
-            intervention_value = [i for i in intervention if i["variable"] == var][0]["value"]
-            variable_values = [val for val in bayes_net.values if val["variable"] == var][0]["values"]
-            if intervention_value not in variable_values:
-                return f"{intervention_value} is not a value of {var} in the Bayesian Network!"
 
-    #Get the joint distribution over the Bayesian Network, applying any specified interventions.
+            if value not in value_lookup[var]:
+                return f"{value} is not a value of {var} in the Bayesian Network!"
+
+    # Get the joint distribution
     joint_df = get_joint_distribution(bayes_net, intervention)
 
-    #Create a Pandas dataframe in which the first column has a blank heading and contains the
-    #values of the event variable, and each other column heading specifies a combination of 
-    #possible values for the intervention variable, with entries showing the probability of the
-    #row event, given the column events.
-    column_names = [' ']
-    condition_values = [v for v in bayes_net.values if v['variable'] in condition_variables]
+    # Generate conditioning combinations
+    condition_values = [
+        {"variable": var, "values": value_lookup[var]}
+        for var in condition_variables
+    ]
     condition_combos = probabilities.get_joint_combos(condition_values)
-    event_values = [v for v in bayes_net.values if v['variable'] == event_variable][0]['values']
+
+    event_values = value_lookup[event_variable]
+
+    # Precompute column names
+    combo_keys = [
+        " ".join(f"{c['variable']}={c['value']}" for c in combo)
+        for combo in condition_combos
+    ]
+
     rows = []
-    for val in event_values:
-        dictionary = {' ': val}
-        for cond_combo in condition_combos:
-            dictionary_key = " ".join([f"{c['variable']}={c['value']}" for c in cond_combo])
-            numerator = np.sum([r['joint_probability'] for _, r in joint_df.iterrows() if 
-                                all(r[c['variable']] == c['value'] for c in cond_combo) and r[event_variable] == val])
-            denominator = np.sum([r['joint_probability'] for _, r in joint_df.iterrows() if 
-                                all(r[c['variable']] == c['value'] for c in cond_combo)])
-            dictionary[dictionary_key] = numerator / denominator if denominator > 0 else 0.0
-        rows.append(dictionary)
-    cond_prob_df = pd.DataFrame(rows)
-    return cond_prob_df
+
+    for event_val in event_values:
+
+        row = {" ": event_val}
+
+        for cond_combo, key in zip(condition_combos, combo_keys):
+
+            # Vectorized mask for conditioning assignment
+            mask = np.ones(len(joint_df), dtype=bool)
+
+            for c in cond_combo:
+                mask &= (joint_df[c["variable"]] == c["value"])
+
+            denominator = joint_df.loc[mask, "joint_probability"].sum()
+
+            if denominator == 0:
+                row[key] = 0.0
+                continue
+
+            numerator = joint_df.loc[
+                mask & (joint_df[event_variable] == event_val),
+                "joint_probability"
+            ].sum()
+
+            row[key] = numerator / denominator
+
+        rows.append(row)
+
+    return pd.DataFrame(rows)
 
 
 def get_marginal_distribution(bayes_net:BayesNet, variable:str, intervention=None) -> pd.DataFrame:
