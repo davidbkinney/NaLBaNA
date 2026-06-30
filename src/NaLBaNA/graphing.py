@@ -62,30 +62,6 @@ def nodes_from_graph(graph:list) -> list:
   return list(nodes)
 
 
-def cycle_breaker(cycle:list) -> list:
-  """
-  Uses the LLM to undo any cycles.
-  Args:
-      cycle: list of edges producing a cycle.
-  Returns:
-      list of edges with the cycle broken.
-  """
-  nodes = nodes_from_graph(cycle)
-  client = initialization.get_client()
-  response = client.chat.completions.create(
-      model="gpt-5.4",
-      messages=[{"role": "system",
-      "content": prompts.CYCLE_BREAKER_SYSTEM_PROMPT},
-          {"role": "user", "content": str(cycle)}
-      ],
-      tools=[tools.make_dag_creation_tool(nodes)],
-      tool_choice="required"
-    )
-  json_str = response.choices[0].message.tool_calls[0].function.arguments
-  json = ast.literal_eval(json_str)
-  return json['edges']
-
-
 def graph_generator(prompt:str,nodes:list) -> dict:
     """
     Given a user prompt and a list of nodes, returns a graph defined over those nodes
@@ -114,17 +90,13 @@ def graph_generator(prompt:str,nodes:list) -> dict:
     structured_output = json.loads(arguments_json)
     previous = None
     while True:
-        cycles = find_cycles(structured_output["edges"])
+        cycles = find_cycles(edges)
         if not cycles:
             break
     
-        print("Cycles detected in the generated graph. Enforcing acyclicality.")
-    
-        if structured_output["edges"] == previous:
-            raise RuntimeError("cycle_breaker returned the same graph twice.")
-    
-        previous = structured_output["edges"]
-        structured_output["edges"] = cycle_breaker(structured_output["edges"])
+        cycle = cycles[0]
+        edge_to_remove = cycle[-1] 
+        edges.remove(edge_to_remove)
         
     return structured_output["edges"]
         
