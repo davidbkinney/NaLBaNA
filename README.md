@@ -20,7 +20,7 @@ receive as output a Python object containing:
 4. A joint probability distribution over each variable in the DAG.
 
 All four of these steps are accomplished by strategically prompting a large language model 
-(or "LLM"), specifically GPT-4.1. As such, _all four of the elements of the Bayeian network 
+(or "LLM"), specifically GPT-5.4. As such, _all four of the elements of the Bayeian network 
 described above represent an LLM's "best guess" at the underlying causal dynamics of the described
 system (i.e., the most likely response given the user input and the LLM's training data), 
 rather than any specific "ground truth" or data-based reality._
